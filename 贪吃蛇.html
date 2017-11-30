@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		*{
+			margin: 0px;
+			padding: 0px;
+			list-style: none;
+		}
+		html{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+		.box{
+			width: 500px;
+			height: 500px;
+			margin: 100px auto;
+			background: #999;
+			border-top: 1px solid #000000;
+			border-left: 1px solid #000000;
+			
+		}
+		.rect{
+			width: 19px;
+			height: 19px;
+			background: red;
+			margin-right: 1px;
+			margin-bottom: 1px;
+			float: left;
+		}
+		.fen{
+			width: 150px;
+			height: 150px;
+			border: 2px solid #ff6700;
+			position: absolute;
+			top: 100px;
+			left: 100px;
+			line-height: 75px;
+			font-size: 30px;
+			text-align: center;
+			z-index: -1;
+
+		}
+		.mask{
+			width: 100%;
+			height: 100%;
+			transition: 2s;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			opacity: 1;
+		}
+		.mask li{
+			width: 50%;
+			height: 100%;
+			color: #ffffff;
+			font-size: 80px;
+			line-height: 1000px;
+			transition: 1s;
+			float: left;
+			background:#333;
+		}
+		.mask li:last-child{
+			text-align:left;
+		}
+		.mask li:first-child{
+			text-align:right;
+		}
+		.begin{
+			width: 200px;
+			height: 100px;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			right: 0px;
+			bottom: 0px;
+			margin: auto;
+			border: 1px solid palevioletred;
+			line-height: 50px;
+			border-radius:6%;
+			color: #fff;
+			text-align: center;
+			background: turquoise;
+			transform: translate(0px,-1000px);
+			transition: 1s;
+			font-size: 30px;
+		}
+		.begin span{
+			font-size: 30px;
+		}
+		.begin .button{
+			background: orange;
+			width: 80px;
+			height: 30px;
+			float: left;
+			border-radius:10%;
+			position: absolute;
+			bottom: 20px;
+			right: 55px;
+			font-size: 20px;
+			line-height: 30px;
+		}
+	</style>
+	<body>
+		<ul class="mask">
+			<li class="you">开始</li>
+			<li class=xi>游戏</li>
+		</ul>
+		<ul class="box">
+		</ul>
+		<ul class="fen">
+			<li>得分：<span>0</span></li>
+			<li class="deng">等级：<span>1</span></li>
+		</ul>
+		<div class="begin">
+			<span class="cont">游戏结束</span>
+			<div class="button">重新开始</div>
+		</div>
+	</body>
+	<script>
+		var box=document.querySelector(".box");
+		var mask=document.querySelector(".mask");
+		var list1=document.querySelector(".mask li");
+		var list2=document.querySelector(".mask li:last-child");
+		var begin=document.querySelector(".begin")
+		var btn1=document.querySelector(".button");
+		var conten=document.querySelector(".begin .cont");
+		console.log(conten)
+		var	flag=true;
+		mask.onclick=function(){//点击游戏开始
+			document.querySelector(".mask li").style.transform="translate(-1000px,0px)";
+			document.querySelector(".mask li:last-child").style.transform="translate(1000px,0px)";
+			all()
+		}
+	function all(){
+		for (var i=0;i<25;i++) {  //y轴
+			for (var j=0;j<25;j++) {  //x轴
+				var li=document.createElement("li");//创建表格
+				li.id="a"+j+"_"+i;
+				li.className="rect";
+				box.appendChild(li);
+			}
+		}
+		var snake=[{x:12,y:13},{x:13,y:13},{x:14,y:13}];//设置初始位置
+		function creatsnake(sanke){//将蛇进行绘制
+			snake.forEach(function(val,index){
+			var y=val.y;
+			var x=val.x;
+			var id="#a"+x+"_"+y;
+			document.querySelector(id).style.background="#fff";
+			document.querySelector("#a"+snake[snake.length-1].x+"_"+snake[snake.length-1].y).style.background="greenyellow";//蛇头
+			flag = true;
+			})
+		}
+		creatsnake(snake)
+		// 创建随机点，绘制食物
+		function creatfoot(snake){
+				var x=Math.floor(Math.random()*25);
+				var y=Math.floor(Math.random()*25);
+			while(cheick(x,y,snake)){
+				var x=Math.floor(Math.random()*25);
+				var y=Math.floor(Math.random()*25);
+			}
+			document.querySelector("#a"+x+"_"+y).style.background="#fff";
+			return{x,y};
+		}
+		// 得出随机点对象
+		var randomPoint = creatfoot(snake);
+		
+		function cheick(x,y,snake){//判断x,y是否和蛇的身体重叠
+			return snake.some(function(val,n){
+					return val.x==x && val.y==y;
+				})
+		}
+		
+		
+		// 移动
+		var tade="right";
+		var score=0;//分数;
+		var grade=1;//等级;
+		var time=300;//时间
+		
+		
+		function move(){
+			if(tade=="right"){
+				var newx=snake[snake.length-1].x+1;
+				var newy=snake[snake.length-1].y;
+			}else if(tade=="top"){
+				var newx=snake[snake.length-1].x;
+				var newy=snake[snake.length-1].y-1;
+			}else if(tade=="left"){
+				var newx=snake[snake.length-1].x-1;
+				var newy=snake[snake.length-1].y;
+			}else if(tade=="bottom"){
+				var newx=snake[snake.length-1].x;
+				var newy=snake[snake.length-1].y+1;
+			}
+			if(newx>24|| newx<0||newy>24||newy<0 ||cheick(newx,newy,snake)){
+				begin.style.transform="translate(0px,0px)";
+				conten.innerText="游戏结束";
+				btn1.innerText="重新开始";
+				clearInterval(t)
+				return;
+			}
+			snake.push({x:newx,y:newy});
+			// 随机点与蛇头位置重合，吃随机点食物
+			if (newx == randomPoint.x && newy == randomPoint.y) {
+				snake.push(randomPoint);
+				score++;
+				if(score%3==0){
+					grade++;
+					clearInterval(t);
+					time-=50;
+					t=setInterval(function(){
+						move();
+					},time);
+					document.querySelector(".fen li:last-child").innerHTML=`等级：<span>${grade}</span>`;
+				}
+		
+				document.querySelector(".fen li").innerHTML=`得分：<span>${score}</span>`;
+				
+				// 吃了随机点后要在创建随机点
+				randomPoint = creatfoot(snake);
+				
+				
+				
+			}
+			var frist=snake.shift();
+			//删除的元素添加颜色
+			document.querySelector("#a"+frist.x+"_"+frist.y).style.background="red";
+			creatsnake(snake);
+		}
+		var t;//声明时间，设置点击开始游戏后，蛇开始动
+		list1.addEventListener(`webkitTransitionEnd`,function(){
+			clearInterval(t);
+			 t=setInterval(function(){
+			
+			     move(tade);
+		      },time);
+		     mask.style.zIndex='-1'
+		})
+		
+//		设置左上右下按钮
+		document.onkeydown=function(a){
+			if(!flag){
+				return;
+			}
+            flag=false;
+			switch(a.keyCode){
+				case 37:if(tade!="right"){
+					tade = "left";
+                   
+				}
+				break;
+				case 38:if(tade!="bottom"){
+					
+					tade = "top";
+				}
+				break;
+				case 39:if(tade!="left"){
+					
+					tade = "right";
+				}
+				break;
+				case 40:if(tade!="top"){
+
+					tade = "bottom";
+				}
+				break;
+				case 13: 
+				    clearInterval(t);
+					begin.style.transform="translate(0px,0px)";
+					conten.innerText="继续";
+					btn1.innerText="继续游戏";
+				break;
+				default:
+					break;
+			}
+			
+			
+		}
+		btn1.onclick=function(){
+				if(this.innerText=="继续游戏"){
+					begin.style.transform="translate(0px,-1000px)";
+						 clearInterval(t);
+						 t=setInterval(function(){
+						 	
+							move(tade);
+						},time);
+				}else{
+					location.reload()
+				}
+		}
+}
+	</script>
+</html>
